@@ -86,13 +86,6 @@ vertx.eventBus.with { eb ->
                     }
                 }
                 break
-            case 'delete':
-                String stmt = "DELETE FROM $body.collection"
-                send( persistor, 
-                      [ action:'update', stmt:stmt ] ) { reply ->
-                    message.reply( reply.body() )
-                }
-                break
             case 'save':
                 if( body.collection == 'orders' ) {
                     saveOrder( eb, body.document.username, body.document.items ) {
