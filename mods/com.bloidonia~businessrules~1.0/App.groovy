@@ -79,6 +79,7 @@ vertx.eventBus.with { eb ->
                 break
             case 'findone':
                 if( body.collection == 'users' && body.matcher ) { // login attempt
+                    eb.send( metrics, [ name:'login.timer', action:'start' ] )
                     eb.send( metrics, [ name:'login.attempts', action:'inc' ] )
                     send( 'com.bloidonia.jdbcpersistor',
                           [ action:'select',
@@ -92,6 +93,7 @@ vertx.eventBus.with { eb ->
                           eb.send( metrics, [ name:'login.failures', action:'inc' ] )
                         }
                         message.reply( [ status: success ? 'ok' : 'error', result:body.matcher ] )
+                        eb.send( metrics, [ name:'login.timer', action:'stop' ] )
                     }
                 }
                 break
