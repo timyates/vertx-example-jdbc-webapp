@@ -1,3 +1,4 @@
 mods/com.bloidonia~mod-jdbc-persistor~2.1/
+mods/com.bloidonia~mod-metrics~0.0.1-SNAPSHOT/
 mods/io.vertx~mod-auth-mgr~2.0.0-final/
 mods/io.vertx~mod-web-server~2.0.0-final/

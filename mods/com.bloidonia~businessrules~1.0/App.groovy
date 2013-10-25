@@ -1,4 +1,5 @@
 persistor = 'com.bloidonia.jdbcpersistor'
+metrics   = 'com.bloidonia.metrics'
 
 def createDbStructure( eb, Closure done ) {
     eb.send( persistor, [ action:'execute',
@@ -78,16 +79,25 @@ vertx.eventBus.with { eb ->
                 break
             case 'findone':
                 if( body.collection == 'users' && body.matcher ) { // login attempt
+                    eb.send( metrics, [ name:'login.attempts', action:'inc' ] )
                     send( 'com.bloidonia.jdbcpersistor',
                           [ action:'select',
                             stmt:  'SELECT username FROM users WHERE username=? AND password=?',
                             values:[ body.matcher.username, body.matcher.password ] ] ) { response ->
-                        message.reply( [ status: response.body().result.USERNAME?.size() ? 'ok' : 'error', result:body.matcher ] )
+                        boolean success = response.body().result.USERNAME?.size()
+                        if( success ) {
+                          eb.send( metrics, [ name:'login.successes', action:'inc' ] )
+                        }
+                        else {
+                          eb.send( metrics, [ name:'login.failures', action:'inc' ] )
+                        }
+                        message.reply( [ status: success ? 'ok' : 'error', result:body.matcher ] )
                     }
                 }
                 break
             case 'save':
                 if( body.collection == 'orders' ) {
+                    eb.send( metrics, [ name:'orders.saved', action:'inc' ] )
                     saveOrder( eb, body.document.username, body.document.items ) {
                         message.reply( [ status: 'ok' ] )
                     }

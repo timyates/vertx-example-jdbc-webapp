@@ -85,8 +85,11 @@ container.with {
             }
 
             // Start the web server, with the config we defined above
-
             deployModule('io.vertx~mod-web-server~2.0.0-final', webServerConf)
+
+            // Start the stats
+            deployModule('com.bloidonia~mod-metrics~0.0.1-SNAPSHOT', [ address:'com.bloidonia.metrics' ] )
+
         } else {
             println "Failed to deploy ${asyncResult.cause()}"
         }
